@@ -1,3 +1,5 @@
+import string
+
 # Problem Set 2, hangman.py
 # Name:
 # Collaborators:
@@ -60,7 +62,16 @@ def is_word_guessed(secret_word, letters_guessed):
     returns: boolean, True if all the letters of secret_word are in letters_guessed;
       False otherwise
     """
-    pass
+    letters_guessed_hash_table = {}
+
+    for letter in letters_guessed:
+        letters_guessed_hash_table[letter] = True
+
+    for letter in secret_word:
+        if letter not in letters_guessed_hash_table:
+            return False
+
+    return True
 
 
 def get_guessed_word(secret_word, letters_guessed):
@@ -70,8 +81,19 @@ def get_guessed_word(secret_word, letters_guessed):
     returns: string, comprised of letters, underscores (_), and spaces that represents
       which letters in secret_word have been guessed so far.
     """
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+    guessed_word_arr = []
+    letters_guessed_hash_table = {}
+
+    for letter in letters_guessed:
+        letters_guessed_hash_table[letter] = True
+
+    for letter in secret_word:
+        if letter not in letters_guessed_hash_table:
+            guessed_word_arr.append("_ ")
+        else:
+            guessed_word_arr.append(letter)
+
+    return "".join(guessed_word_arr)
 
 
 def get_available_letters(letters_guessed):
@@ -80,8 +102,19 @@ def get_available_letters(letters_guessed):
     returns: string (of letters), comprised of letters that represents which letters have not
       yet been guessed.
     """
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+    letters_guessed_hash_table = {}
+
+    for letter in letters_guessed:
+        letters_guessed_hash_table[letter] = True
+
+    all_lowercase_letters = string.ascii_lowercase
+    available_letters = []
+
+    for letter in all_lowercase_letters:
+        if letter not in letters_guessed_hash_table:
+            available_letters.append(letter)
+
+    return "".join(available_letters)
 
 
 def hangman(secret_word):
@@ -192,12 +225,15 @@ if __name__ == "__main__":
     # To test part 2, comment out the pass line above and
     # uncomment the following two lines.
 
-    secret_word = choose_word(wordlist)
-    hangman(secret_word)
+    # secret_word = choose_word(wordlist)
+    # hangman(secret_word)
 
+    secret_word = "apple"
     letters_guessed = ["e", "i", "k", "p", "r", "s"]
 
     print(is_word_guessed(secret_word, letters_guessed))
+    print(get_guessed_word(secret_word, letters_guessed))
+    print(get_available_letters(letters_guessed))
 
 ###############
 
