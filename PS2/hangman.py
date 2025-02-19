@@ -19,7 +19,7 @@ WORDLIST_FILENAME = "words.txt"
 
 class Hangman:
     def __init__(self):
-        self.wordlist = self.load_words()
+        self.word_list = self.load_words()
 
     def load_words(self):
         """
@@ -33,18 +33,18 @@ class Hangman:
         inFile = open(WORDLIST_FILENAME, "r")
         # line: string
         line = inFile.readline()
-        # wordlist: list of strings
-        wordlist = line.split()
-        print("  ", len(wordlist), "words loaded.")
-        return wordlist
+        # word_list: list of strings
+        word_list = line.split()
+        print("  ", len(word_list), "words loaded.")
+        return word_list
 
-    def choose_word(self, word_list):
+    def choose_word(self):
         """
-        wordlist (list): list of words (strings)
+        word_list (list): list of words (strings)
 
-        Returns a word from wordlist at random
+        Returns a word from word_list at random
         """
-        return random.choice(word_list)
+        return random.choice(self.word_list)
 
     def is_word_guessed(self, secret_word, letters_guessed):
         """
@@ -107,7 +107,7 @@ class Hangman:
 
         return "".join(available_letters)
 
-    def hangman(self, secret_word):
+    def hangman(self, secret_word, with_hints=False):
         """
         secret_word: string, the secret word to guess.
 
@@ -147,26 +147,33 @@ class Hangman:
         print(f"I am thinking of a word that is {len(secret_word)} letters long.")
         print(f"You have {warnings_left} warnings left.")
 
-        while (guesses_left > 0 or warnings_left > 0) and not self.is_word_guessed(
+        while guesses_left > 0 and not self.is_word_guessed(
             secret_word, letters_guessed
         ):
+            guessed_word = self.get_guessed_word(secret_word, letters_guessed)
+            guessed_letter = input("Please guess a letter: ").lower()
+
+            if with_hints and guessed_letter == "*":
+                print("Possible word matches are: ")
+                print(self.show_possible_matches(guessed_word))
+                continue
+
             available_letters = self.get_available_letters(letters_guessed)
 
             print("-------------")
             print(f"You have {guesses_left} guesses left.")
             print(f"Available letters: {available_letters}")
-            guessed_letter = input("Please guess a letter: ").lower()
 
             if not guessed_letter.isalpha():
                 if warnings_left > 0:
                     warnings_left -= 1
                     print(
-                        f"Oops! That is not a valid letter. You have {warnings_left} warnings left: {self.get_guessed_word(secret_word, letters_guessed)}"
+                        f"Oops! That is not a valid letter. You have {warnings_left} warnings left: {guessed_word}"
                     )
                 else:
                     guesses_left -= 1
                     print(
-                        f"Oops! That is not a valid letter. You have no warnings left so you lose one guess: {self.get_guessed_word(secret_word, letters_guessed)}"
+                        f"Oops! That is not a valid letter. You have no warnings left so you lose one guess: {guessed_word}"
                     )
 
                 continue
@@ -175,12 +182,12 @@ class Hangman:
                 if warnings_left > 0:
                     warnings_left -= 1
                     print(
-                        f"Oops! You've already guessed that letter. You now have {warnings_left} warnings: {self.get_guessed_word(secret_word, letters_guessed)}"
+                        f"Oops! You've already guessed that letter. You now have {warnings_left} warnings: {guessed_word}"
                     )
                 else:
                     guesses_left -= 1
                     print(
-                        f"Oops! You've already guessed that letter. You have no warnings left so you lose one guess: {self.get_guessed_word(secret_word, letters_guessed)}"
+                        f"Oops! You've already guessed that letter. You have no warnings left so you lose one guess: {guessed_word}"
                     )
 
                 continue
@@ -209,13 +216,6 @@ class Hangman:
         else:
             print("------------")
             print(f"Sorry, you ran out of guesses. The word was '{secret_word}'.")
-
-    # When you've completed your hangman function, scroll down to the bottom
-    # of the file and uncomment the first two lines to test
-    # (hint: you might want to pick your own
-    # secret_word while you're doing your own testing)
-
-    # -----------------------------------
 
     def match_with_gaps(self, my_word, other_word):
         """
@@ -247,7 +247,7 @@ class Hangman:
     def show_possible_matches(self, my_word):
         """
         my_word: string with _ characters, current guess of secret word
-        returns: nothing, but should print out every word in wordlist that matches my_word
+        returns: nothing, but should print out every word in word_list that matches my_word
                 Keep in mind that in hangman when a letter is guessed, all the positions
                 at which that letter occurs in the secret word are revealed.
                 Therefore, the hidden letter(_ ) cannot be one of the letters in the word
@@ -256,7 +256,7 @@ class Hangman:
         """
         possible_matching_words = []
 
-        for word in self.wordlist:
+        for word in self.word_list:
             is_possible_matching_word = self.match_with_gaps(my_word, word)
 
             if is_possible_matching_word:
@@ -289,45 +289,24 @@ class Hangman:
         * After each guess, you should display to the user the
           partially guessed word so far.
 
-        * If the guess is the symbol *, print out all words in wordlist that
+        * If the guess is the symbol *, print out all words in word_list that
           matches the current guessed word.
 
         Follows the other limitations detailed in the problem write-up.
         """
-        # FILL IN YOUR CODE HERE AND DELETE "pass"
-        pass
-
-
-# When you've completed your hangman_with_hint function, comment the two similar
-# lines above that were used to run the hangman function, and then uncomment
-# these two lines and run this file to test!
-# Hint: You might want to pick your own secret_word while you're testing.
+        self.hangman(secret_word, with_hints=True)
 
 
 if __name__ == "__main__":
-    # pass
-
-    # To test part 2, comment out the pass line above and
-    # uncomment the following two lines.
-
-    # secret_word = choose_word(wordlist)
-
-    secret_word = "tact"
-
     hangman = Hangman()
+    secret_word = hangman.choose_word()
     # hangman.hangman(secret_word)
     # print(hangman.match_with_gaps("te_ t", "tact"))
     # print(hangman.match_with_gaps("a_ _ le", "banana"))
     # print(hangman.match_with_gaps("a_ _ le", "apple"))
-    print(hangman.match_with_gaps("a_ ple", "apple"))
-    print(hangman.show_possible_matches("t_ _ t"))
-    print(hangman.show_possible_matches("abbbb_ "))
-    print(hangman.show_possible_matches("a_ pl_ "))
-
+    # print(hangman.match_with_gaps("a_ ple", "apple"))
+    # print(hangman.show_possible_matches("t_ _ t"))
+    # print(hangman.show_possible_matches("abbbb_ "))
+    # print(hangman.show_possible_matches("a_ pl_ "))
+    hangman.hangman_with_hints(secret_word)
 ###############
-
-# To test part 3 re-comment out the above lines and
-# uncomment the following two lines.
-
-# secret_word = choose_word(wordlist)
-# hangman_with_hints(secret_word)
