@@ -226,8 +226,23 @@ class Hangman:
             _ , and my_word and other_word are of the same length;
             False otherwise:
         """
-        # FILL IN YOUR CODE HERE AND DELETE "pass"
-        pass
+        word1 = my_word.strip().replace(" ", "")
+        word2 = other_word.strip()
+
+        word1_letters = {letter: True for letter in word1 if letter != "_"}
+
+        if len(word1) != len(word2):
+            return False
+
+        for i in range(len(word1)):
+            if word1[i] != word2[i]:
+                if word1[i] != "_":
+                    return False
+
+                if word2[i] in word1_letters:
+                    return False
+
+        return True
 
     def show_possible_matches(self, my_word):
         """
@@ -239,8 +254,18 @@ class Hangman:
                 that has already been revealed.
 
         """
-        # FILL IN YOUR CODE HERE AND DELETE "pass"
-        pass
+        possible_matching_words = []
+
+        for word in self.wordlist:
+            is_possible_matching_word = self.match_with_gaps(my_word, word)
+
+            if is_possible_matching_word:
+                possible_matching_words.append(word)
+
+        if not possible_matching_words:
+            return "No matches found"
+
+        return " ".join(possible_matching_words)
 
     def hangman_with_hints(self, secret_word):
         """
@@ -290,7 +315,14 @@ if __name__ == "__main__":
     secret_word = "tact"
 
     hangman = Hangman()
-    hangman.hangman(secret_word)
+    # hangman.hangman(secret_word)
+    # print(hangman.match_with_gaps("te_ t", "tact"))
+    # print(hangman.match_with_gaps("a_ _ le", "banana"))
+    # print(hangman.match_with_gaps("a_ _ le", "apple"))
+    print(hangman.match_with_gaps("a_ ple", "apple"))
+    print(hangman.show_possible_matches("t_ _ t"))
+    print(hangman.show_possible_matches("abbbb_ "))
+    print(hangman.show_possible_matches("a_ pl_ "))
 
 ###############
 
