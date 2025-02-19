@@ -1,10 +1,4 @@
-def ask_for_float_input(prompt):
-    while True:
-        try:
-            float_val = float(input(prompt).strip())
-            return float_val
-        except ValueError:
-            pass
+from utils import ask_for_float_input
 
 
 annual_salary = ask_for_float_input("Enter your annual salary: ")
