@@ -122,6 +122,9 @@ def get_word_score(word, n):
     sum_letter_points = 0
 
     for char in word.lower():
+        if char == "*":
+            continue
+
         sum_letter_points += SCRABBLE_LETTER_VALUES[char]
 
     points_from_removed_hand_letters = 7 * len(word) - 3 * (n - len(word))
@@ -170,14 +173,14 @@ def deal_hand(n):
     returns: dictionary (string -> int)
     """
 
-    hand = {}
+    hand = {"*": 1}
     num_vowels = int(math.ceil(n / 3))
 
-    for i in range(num_vowels):
+    for _ in range(num_vowels - 1):
         x = random.choice(VOWELS)
         hand[x] = hand.get(x, 0) + 1
 
-    for i in range(num_vowels, n):
+    for _ in range(num_vowels, n):
         x = random.choice(CONSONANTS)
         hand[x] = hand.get(x, 0) + 1
 
@@ -205,8 +208,18 @@ def update_hand(hand, word):
     hand: dictionary (string -> int)
     returns: dictionary (string -> int)
     """
+    new_hand = hand.copy()
 
-    pass  # TO DO... Remove this line when you implement this function
+    for letter in word.lower():
+        if letter in new_hand:
+            letter_count = new_hand.get(letter, 0)
+
+            if letter_count > 0:
+                new_hand[letter] -= 1
+            else:
+                del new_hand[letter_count]
+
+    return new_hand
 
 
 #
@@ -224,7 +237,51 @@ def is_valid_word(word, hand, word_list):
     returns: boolean
     """
 
-    pass  # TO DO... Remove this line when you implement this function
+    "c*wz"
+
+    potential_words = []
+    word_has_an_asterisk = word.find("*") != -1
+
+    if word_has_an_asterisk:
+        for vowel in VOWELS:
+            word_with_vowel = word.replace("*", vowel)
+            potential_words.append(word_with_vowel)
+
+        for word in potential_words:
+            if is_valid_word_helper(word.lower(), hand, word_list, use_asterisk=True):
+                return True
+
+        return False
+
+    return is_valid_word_helper(word.lower(), hand, word_list)
+
+
+def is_valid_word_helper(lowercase_word, hand, word_list, use_asterisk=False):
+    # breakpoint()
+
+    if lowercase_word not in word_list:
+        return False
+
+    new_hand = hand.copy()
+
+    for letter in lowercase_word:
+        if letter not in new_hand:
+            can_use_asterisk = use_asterisk and "*" in hand and hand["*"] > 0
+
+            if can_use_asterisk:
+                hand["*"] -= 1
+                continue
+
+            return False
+        else:
+            letter_count = new_hand.get(letter, 0)
+
+            if letter_count > 0:
+                new_hand[letter] -= 1
+            else:
+                return False
+
+    return True
 
 
 #
@@ -381,4 +438,8 @@ def play_game(word_list):
 #
 if __name__ == "__main__":
     word_list = load_words()
-    play_game(word_list)
+    # play_game(word_list)
+
+    # is_valid_word(
+    #     "h*ney", {"n": 1, "h": 1, "*": 1, "y": 1, "d": 1, "w": 1, "e": 2}, word_list
+    # )
