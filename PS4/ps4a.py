@@ -3,12 +3,13 @@
 # Collaborators:
 # Time Spent: x:xx
 
+
 def get_permutations(sequence):
-    '''
+    """
     Enumerate all permutations of a given string
 
     sequence (string): an arbitrary string to permute. Assume that it is a
-    non-empty string.  
+    non-empty string.
 
     You MUST use recursion for this part. Non-recursive solutions will not be
     accepted.
@@ -21,20 +22,40 @@ def get_permutations(sequence):
 
     Note: depending on your implementation, you may return the permutations in
     a different order than what is listed here.
-    '''
+    """
 
-    pass #delete this line and replace with your code here
+    permutations = {}
 
-if __name__ == '__main__':
-#    #EXAMPLE
-#    example_input = 'abc'
-#    print('Input:', example_input)
-#    print('Expected Output:', ['abc', 'acb', 'bac', 'bca', 'cab', 'cba'])
-#    print('Actual Output:', get_permutations(example_input))
-    
-#    # Put three example test cases here (for your sanity, limit your inputs
-#    to be three characters or fewer as you will have n! permutations for a 
-#    sequence of length n)
+    # "abc"
+    for i in range(len(sequence)):  # i = 1, j = 1
+        for j in range(len(sequence)):  # bac
+            if j == 0:
+                permutation = sequence[i] + sequence[0:i] + sequence[i + 1 :]
+            elif j == len(sequence) - 1:
+                permutation = sequence[0:i] + sequence[i + 1 :] + sequence[i]
+            else:
+                permutation = sequence[0:i] + sequence[i] + sequence[i + 1 :]
 
-    pass #delete this line and replace with your code here
+            permutations[permutation] = True
 
+    # def helper_permutations(sequence):
+    #     if len(sequence) or not sequence:
+    #         permutations[sequence] = True
+    #         return
+
+    #     helper_permutations()
+
+    # helper_permutations(sequence)
+
+    return list(permutations.keys())
+
+
+if __name__ == "__main__":
+    example_input = "abc"
+    print("Input:", example_input)
+    print("Expected Output:", ["abc", "acb", "bac", "bca", "cab", "cba"])
+    print("Actual Output:", get_permutations(example_input))
+
+    #    # Put three example test cases here (for your sanity, limit your inputs
+    #    to be three characters or fewer as you will have n! permutations for a
+    #    sequence of length n)
