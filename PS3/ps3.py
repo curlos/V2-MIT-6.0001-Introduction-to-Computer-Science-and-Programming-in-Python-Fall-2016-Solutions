@@ -239,14 +239,15 @@ def is_valid_word(word, hand, word_list):
     returns: boolean
     """
 
-    "c*wz"
-
     potential_words = []
     word_has_an_asterisk = word.find("*") != -1
 
+    # IMPORTANT: The problem states that we should only let a vowel be used in the asterisk but after playing for a bit, I kept forgetting that you could only use vowels becasue the CLI doesn't say you can only use vowels. I think restricting it to only vowels is dumb anyways so the asterisk can be used with both vowels and consonants in my version below.
+    VOWELS_OR_CONSONANTS = VOWELS + CONSONANTS
+
     if word_has_an_asterisk:
-        for vowel in VOWELS:
-            word_with_vowel = word.replace("*", vowel)
+        for letter in VOWELS_OR_CONSONANTS:
+            word_with_vowel = word.replace("*", letter)
             potential_words.append(word_with_vowel)
 
         for word in potential_words:
@@ -346,7 +347,7 @@ def play_hand(hand, word_list):
         # If the input is two exclamation points:
         if word == "!!":
             # End the game (break out of the loop)
-            print(f"Total score: {total_score} points")
+            print(f"Total score for this hand: {total_score} points")
             return total_score
 
         # Otherwise (the input is not two exclamation points):
@@ -367,7 +368,7 @@ def play_hand(hand, word_list):
 
     # Game is over (user entered '!!' or ran out of letters),
     # so tell user the total score
-    print(f"Ran out of letters. Total score: {total_score}")
+    print(f"Ran out of letters. Total score for this hand: {total_score}")
 
     # Return the total score as result of function
     return total_score
@@ -405,15 +406,35 @@ def substitute_hand(hand, letter):
     letter: string
     returns: dictionary (string -> int)
     """
+    if letter not in hand:
+        return hand
 
-    pass  # TO DO... Remove this line when you implement this function
+    # Clone the hand
+    new_hand = hand.copy()
+
+    # Keep generating a random letter from VOWELS or CONSONANTS until we get a letter that is not already in the hand and is not the letter the user picked to delete. Should be possible considering that by this point we know the letter is not already in the hand.
+    VOWELS_OR_CONSONANTS = VOWELS + CONSONANTS
+    random_letter = random.choice(VOWELS_OR_CONSONANTS)
+
+    while random_letter in new_hand:
+        random_letter = random.choice(VOWELS_OR_CONSONANTS)
+
+    user_letter_count = new_hand[letter]
+
+    # Remove the user's letter from the hand.
+    del new_hand[letter]
+
+    # Add the random letter as a key with the user letter's count as the value to the new hand's dictionary.
+    new_hand[random_letter] = user_letter_count
+
+    return new_hand
 
 
 def play_game(word_list):
     """
     Allow the user to play a series of hands
 
-    * Asks the user to input a total number of hands
+    * Asks the user to input a total number of hands [X]
 
     * Accumulates the score for each hand into a total score for the
       entire series
@@ -439,10 +460,69 @@ def play_game(word_list):
 
     word_list: list of lowercase strings
     """
+    num_of_hands = int(input("Enter total number of hands: "))
+    all_hands_total_score = 0
+    used_substitute = False
+    used_replay_hand = False
 
-    print(
-        "play_game not implemented."
-    )  # TO DO... Remove this line when you implement this function
+    for _ in range(num_of_hands):
+        current_hand = deal_hand(HAND_SIZE)
+
+        if used_substitute:
+            if "*" in current_hand:
+                del current_hand["*"]
+
+        print(f"\nCurrent hand: {display_hand(current_hand)}")
+
+        if not used_substitute:
+            use_substitute_input = input(
+                "Would you like to substitute a letter? "
+            ).lower()
+
+            while use_substitute_input not in ["yes", "no", "y", "n"]:
+                use_substitute_input = input("Would you like to substitute a letter? ")
+
+            use_substitute = use_substitute_input in ["yes", "y"]
+
+            if use_substitute:
+                letter_to_replace = input(
+                    "Which letter would you like to replace? "
+                ).lower()
+
+                while not letter_to_replace.isalpha() or len(letter_to_replace) != 1:
+                    letter_to_replace = input(
+                        "Which letter would you like to replace? "
+                    ).lower()
+
+                current_hand = substitute_hand(current_hand, letter_to_replace)
+                used_substitute = True
+
+        hand_total_score = play_hand(current_hand, word_list)
+
+        if not used_replay_hand:
+            use_replay_hand_input = input("Would you like to replay the hand? ").lower()
+
+            while use_replay_hand_input not in ["yes", "no", "y", "n"]:
+                use_replay_hand_input = input("Would you like to replay the hand? ")
+
+            use_replay_hand = use_replay_hand_input in ["yes", "y"]
+
+            if use_replay_hand:
+                used_replay_hand = True
+
+                if "*" in current_hand:
+                    del current_hand["*"]
+
+                hand_total_score = max(
+                    hand_total_score, play_hand(current_hand, word_list)
+                )
+
+        all_hands_total_score += hand_total_score
+
+    print("----------")
+    print(f"Total score over all hands: {all_hands_total_score}")
+
+    return all_hands_total_score
 
 
 #
@@ -452,6 +532,8 @@ def play_game(word_list):
 #
 if __name__ == "__main__":
     word_list = load_words()
-    # play_game(word_list)
+    play_game(word_list)
     # play_hand({"a": 1, "j": 1, "e": 1, "f": 1, "*": 1, "r": 1, "x": 1}, word_list)
-    play_hand({"a": 1, "c": 1, "f": 1, "i": 1, "*": 1, "t": 1, "x": 1}, word_list)
+    # play_hand({"a": 1, "c": 1, "f": 1, "i": 1, "*": 1, "t": 1, "x": 1}, word_list)
+
+    # print(substitute_hand({"h": 1, "e": 1, "l": 2, "o": 1}, "l"))
