@@ -215,11 +215,69 @@ if __name__ == "__main__":
     message = SubMessage("Hello World!")
     permutation = "eaiuo"
     enc_dict = message.build_transpose_dict(permutation)
-    print(enc_dict)
     print("Original message:", message.get_message_text(), "Permutation:", permutation)
     print("Expected encryption:", "Hallu Wurld!")
     print("Actual encryption:", message.apply_transpose(enc_dict))
+
     enc_message = EncryptedSubMessage(message.apply_transpose(enc_dict))
     print("Decrypted message:", enc_message.decrypt_message())
 
     # TODO: WRITE YOUR TEST CASES HERE
+    test_cases = [
+        {
+            "message": "Hello World!",
+            "expected_encryption": "Hallu Wurld!",
+            "vowel_permutation": "eaiuo",
+        },
+        {
+            "message": "Sazabi",
+            "expected_encryption": "Sozobe",
+            "vowel_permutation": "oieua",
+        },
+        {
+            "message": "MSN-00100 Hyaku Shiki",
+            "expected_encryption": "MSN-00100 Hyuka Sheke",
+            "vowel_permutation": "uieoa",
+        },
+    ]
+
+    for test_case in test_cases:
+        message = test_case["message"]
+        vowel_permutation = test_case["vowel_permutation"]
+        expected_encryption = test_case["expected_encryption"]
+        sub_message = SubMessage(message)
+        encrypted_dict = sub_message.build_transpose_dict(vowel_permutation)
+        actual_encryption = sub_message.apply_transpose(encrypted_dict)
+
+        print("-----------\n")
+        print("SubMessage TEST:")
+
+        print(
+            "Original message:",
+            sub_message.get_message_text(),
+            "Vowel Permutation:",
+            vowel_permutation,
+        )
+        print("Expected encryption:", expected_encryption)
+        print("Actual encryption:", actual_encryption)
+
+        if actual_encryption == expected_encryption:
+            print("SUCCESS")
+        else:
+            print("FAILURE")
+
+        print("-----------\n")
+        print("EncryptedSubMessage TEST:")
+        enc_message = EncryptedSubMessage(sub_message.apply_transpose(encrypted_dict))
+        actual_decrypted_message = enc_message.decrypt_message()
+
+        print("Expected decrypted message:", message)
+        print("Actual decrypted message:", actual_decrypted_message)
+
+        if actual_decrypted_message == message:
+            print("SUCCESS")
+        else:
+            # Note: The actual decrypted message will only be equal to the message if all of the words in the original message are actually real (they're in the "words.txt" file). If you pass in a message that contains words like "Sazabi" or "Hyaku Shiki" which are the fictional names of Mobile Suits from GUNDAM, then it will "fail" because it won't recognize those as real words.
+            print("FAILURE")
+
+        print("-----------\n")
