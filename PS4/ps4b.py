@@ -278,21 +278,6 @@ caesar_cipher_examples = {
 
 
 if __name__ == "__main__":
-    # message = Message("Hello, World!")
-    # print(message.apply_shift(4))
-    # print(message.build_shift_dict(2))
-
-    # Example test case (PlaintextMessage)
-    # plaintext = PlaintextMessage("hello", 2)
-    # print("Expected Output: jgnnq")
-    # print("Actual Output:", plaintext.get_message_text_encrypted())
-    #
-
-    # Example test case (CiphertextMessage)
-    # ciphertext = CiphertextMessage("jgnnq")
-    # print("Expected Output:", (24, "hello"))
-    # print("Actual Output:", ciphertext.decrypt_message())
-
     for testcase_key in caesar_cipher_examples:
         shift = caesar_cipher_examples[testcase_key]["shift"]
         cipher_text = caesar_cipher_examples[testcase_key]["ciphertext"]
