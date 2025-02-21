@@ -4,7 +4,7 @@
 # Time Spent: x:xx
 
 
-def get_permutations(sequence):
+def get_permutations(sequence):  # abc
     """
     Enumerate all permutations of a given string
 
@@ -24,38 +24,60 @@ def get_permutations(sequence):
     a different order than what is listed here.
     """
 
-    permutations = {}
+    if len(sequence) == 1:
+        return [sequence]
 
-    # "abc"
-    for i in range(len(sequence)):  # i = 1, j = 1
-        for j in range(len(sequence)):  # bac
-            if j == 0:
-                permutation = sequence[i] + sequence[0:i] + sequence[i + 1 :]
-            elif j == len(sequence) - 1:
-                permutation = sequence[0:i] + sequence[i + 1 :] + sequence[i]
-            else:
-                permutation = sequence[0:i] + sequence[i] + sequence[i + 1 :]
+    first_char = sequence[0]  # b
 
+    sub_permutation_list = get_permutations(sequence[1:])  # ["c"] => ["bc", "cb"]
+    permutations = {}  # { bc, cb }
+
+    for curr_str in sub_permutation_list:
+        for i in range(len(curr_str) + 1):
+            permutation = curr_str[0:i] + first_char + curr_str[i:]
             permutations[permutation] = True
-
-    # def helper_permutations(sequence):
-    #     if len(sequence) or not sequence:
-    #         permutations[sequence] = True
-    #         return
-
-    #     helper_permutations()
-
-    # helper_permutations(sequence)
 
     return list(permutations.keys())
 
 
-if __name__ == "__main__":
-    example_input = "abc"
-    print("Input:", example_input)
-    print("Expected Output:", ["abc", "acb", "bac", "bca", "cab", "cba"])
-    print("Actual Output:", get_permutations(example_input))
+def check_if_testcase_passed(actual_output, expected_output):
+    if len(actual_output) != len(expected_output):
+        return False
 
-    #    # Put three example test cases here (for your sanity, limit your inputs
-    #    to be three characters or fewer as you will have n! permutations for a
-    #    sequence of length n)
+    expected_output_dict = {sequence: True for sequence in expected_output}
+    actual_output_dict = {sequence: True for sequence in actual_output}
+
+    for sequence in expected_output_dict:
+        if sequence not in actual_output_dict:
+            return False
+
+    return True
+
+
+if __name__ == "__main__":
+    test_cases = [
+        {
+            "sequence": "abc",
+            "expected_output": ["abc", "acb", "bac", "bca", "cab", "cba"],
+        },
+        {"sequence": "xy", "expected_output": ["xy", "yx"]},
+        {"sequence": "aaa", "expected_output": ["aaa"]},
+        {"sequence": "c", "expected_output": ["c"]},
+        {"sequence": "bc", "expected_output": ["bc", "cb"]},
+    ]
+
+    for test_case in test_cases:
+        sequence = test_case["sequence"]
+        expected_output = test_case["expected_output"]
+        actual_output = get_permutations(sequence)
+        print("Sequence:", sequence)
+        print("Expected Output:", expected_output)
+        print("Actual Output:", actual_output)
+
+        testcase_passed = check_if_testcase_passed(actual_output, expected_output)
+
+        if testcase_passed:
+            print("SUCCESS")
+        else:
+            print("FAILURE")
+        print("---------------\n")
